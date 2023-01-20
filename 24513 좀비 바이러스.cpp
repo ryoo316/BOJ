@@ -5,8 +5,8 @@ using namespace std;
 
 //구조체
 typedef struct COORD{
-  int x;
-  int y;
+  int x;      //x 좌표
+  int y;      //y 좌표
 }coord;
 
 //큐
@@ -18,6 +18,9 @@ int dy[4] = {0,0,1,-1};
 
 //마을의 상태
 int Matrix[MAX][MAX] = {};
+//시간을 저장하는 배열
+int hour[MAX][MAX] = {};
+//답을 출력하기 위한 배열
 int ans[4] = {};
 
 //행 열
@@ -30,6 +33,7 @@ void BFS(){//시간복잡도 O(n^2)?
     int x = now.x;
     int y = now.y;
     a.pop();                //pop하기
+    hour[x][y]++;           //시간이 지나게한다.
     for(int i=0;i<4;i++){
       int nx = x + dx[i];
       int ny = y + dy[i];
@@ -42,14 +46,11 @@ void BFS(){//시간복잡도 O(n^2)?
           Matrix[nx][ny] = Matrix[x][y];
           //큐에 nx, ny를 넣어준다.
           a.push({nx, ny});
+          hour[nx][ny]++;
         }
       }
-      //1번 바이러스와 2번 바이러스가 만났을 때
-      else if(Matrix[x][y] == 1 && Matrix[nx][ny] == 2)
-      //그 마을의 상태를 3번 바이러스로 전염되게한다.
-        Matrix[nx][ny] = 3;
-      //2번 바이러스와 1번 바이러스가 만났을 때
-      else if(Matrix[x][y] == 2 && Matrix[nx][ny] == 1)
+      //2번 바이러스와 1번 바이러스가 만나고 시간이 1 일때
+      else if(Matrix[x][y] == 2 && Matrix[nx][ny] == 1 && hour[nx][ny] == 1)
       //그 마을의 상태를 3번 바이러스로 전염되게한다.
         Matrix[nx][ny] = 3;
     }
@@ -57,10 +58,14 @@ void BFS(){//시간복잡도 O(n^2)?
 }
 
 int main(){
+  ios_base :: sync_with_stdio(false);
+  cin.tie(NULL);
+  cout.tie(NULL);
   //행 열
   cin >> n >> m;
   for(int i=1;i<=n;i++){
     for(int j=1;j<=m;j++){
+      //마을의 상태 입력하기
       cin >> Matrix[i][j];
     }
   }
@@ -68,8 +73,11 @@ int main(){
   for(int k=1;k<=2;k++){
     for(int i=1;i<=n;i++){
       for(int j=1;j<=m;j++){
-        if(k == Matrix[i][j])
+        if(k == Matrix[i][j]){
+          //큐에 push
           a.push({i, j});
+          hour[i][j]++;
+        }
       }
     }
   }
@@ -84,9 +92,16 @@ int main(){
       }
     }
   }
+  // cout << "\n";
   // for(int i=1;i<=n;i++){
   //   for(int j=1;j<=m;j++){
-  //     cout << Matrix[i][j];
+  //     cout << Matrix[i][j] << " ";
+  //   }
+  //   cout << "\n";
+  // }
+  // for(int i=1;i<=n;i++){
+  //   for(int j=1;j<=m;j++){
+  //     cout << hour[i][j] << " ";
   //   }
   //   cout << "\n";
   // }
